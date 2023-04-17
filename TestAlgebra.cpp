@@ -64,6 +64,24 @@ T TestAlgebra::HSlider(const T& name, const T& init, const T& lo, const T& hi, c
     return 1 + r;
 }
 
+T TestAlgebra::VBargraph(const T& name, const T& lo, const T& hi)
+{
+    int r = 0;
+    for (auto x : {name, lo, hi}) {
+        r = std::max(r, x);
+    }
+    return 1 + r;
+}
+
+T TestAlgebra::HBargraph(const T& name, const T& lo, const T& hi)
+{
+    int r = 0;
+    for (auto x : {name, lo, hi}) {
+        r = std::max(r, x);
+    }
+    return 1 + r;
+}
+
 T TestAlgebra::NumEntry(const T& name, const T& init, const T& lo, const T& hi, const T& step)
 {
     int r = 0;
@@ -163,7 +181,23 @@ T TestAlgebra::Exp(const T& x)
 {
     return 1 + x;
 }
+T TestAlgebra::Lowest(const T& x)
+{
+    return 1 + x;
+}
+T TestAlgebra::Highest(const T& x)
+{
+    return 1 + x;
+}
+T TestAlgebra::IntCast(const T& x)
+{
+    return 1 + x;
+}
 T TestAlgebra::FloatCast(const T& x)
+{
+    return 1 + x;
+}
+T TestAlgebra::BitCast(const T& x)
 {
     return 1 + x;
 }
@@ -178,10 +212,6 @@ T TestAlgebra::Ge(const T& x, const T& y)
 T TestAlgebra::Gt(const T& x, const T& y)
 {
     return 1 + std::max(x, y);
-}
-T TestAlgebra::IntCast(const T& x)
-{
-    return 1 + x;
 }
 T TestAlgebra::Le(const T& x, const T& y)
 {

@@ -30,8 +30,17 @@ class TestAlgebra : public FaustAlgebra<int>
     T Checkbox(const T& name) override;
     T VSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
     T HSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
+    T HBargraph(const T& name, const T& lo, const T& hi) override;
+    T VBargraph(const T& name, const T& lo, const T& hi) override;
+
     T NumEntry(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
     T Attach(const T& x, const T& y) override;
+
+    T IntCast(const T& x) override;
+    T BitCast(const T& x) override;
+    T FloatCast(const T& x) override;
+    T Highest(const T& x) override;
+    T Lowest(const T& x) override;
 
     T Abs(const T& x) override;
     T Add(const T& x, const T& y) override;
@@ -54,11 +63,9 @@ class TestAlgebra : public FaustAlgebra<int>
     T Cosh(const T& x) override;
     T Eq(const T& x, const T& y) override;
     T Exp(const T& x) override;
-    T FloatCast(const T& x) override;
     T Floor(const T& x) override;
     T Ge(const T& x, const T& y) override;
     T Gt(const T& x, const T& y) override;
-    T IntCast(const T& x) override;
     T Le(const T& x, const T& y) override;
     T Log(const T& x) override;
     T Log10(const T& x) override;
