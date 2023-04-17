@@ -1,4 +1,3 @@
-
 #include <string>
 #include <vector>
 
@@ -354,3 +353,17 @@ T TestAlgebra::Waveform(const std::vector<T>&)
 {
     return 2;
 };
+
+// Foreign functions
+T TestAlgebra::ForeignFunction(const std::vector<T>& ff)
+{
+    return 1;
+}
+T TestAlgebra::ForeignVar(const T& type, const T& name, const T& file)
+{
+    return 1;
+}
+T TestAlgebra::ForeignConst(const T& type, const T& name, const T& file)
+{
+    return 1;
+}

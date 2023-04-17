@@ -134,6 +134,11 @@ class FaustAlgebra
     virtual T SoundFileBuffer(const T& sf, const T& x, const T& y, const T& z) = 0;
     virtual T Waveform(const std::vector<T>& w)                                = 0;
 
+    // Foreign functions
+    virtual T ForeignFunction(const std::vector<T>& ff)                 = 0;
+    virtual T ForeignVar(const T& type, const T& name, const T& file)   = 0;
+    virtual T ForeignConst(const T& type, const T& name, const T& file) = 0;
+
     //--------------------------------------------------------------------------------
     // Calling the various operations according to the opcode symbol
     // and the number of arguments
@@ -289,9 +294,13 @@ class FaustAlgebra
         fQuinFuncs[symbol("SigNumEntry")] = &FaustAlgebra::NumEntry;
 
         // Input and output
-
         fUnFuncs[symbol("SigInput")]   = &FaustAlgebra::Input;
         fBinFuncs[symbol("SigOutput")] = &FaustAlgebra::Output;
+
+        // Foreign functions
+        fVarFuncs[symbol("SigFFun")]   = &FaustAlgebra::ForeignFunction;
+        fTriFuncs[symbol("SigFVar")]   = &FaustAlgebra::ForeignVar;
+        fTriFuncs[symbol("SigFConst")] = &FaustAlgebra::ForeignConst;
 
         // Delays, Tables and SoundFiles
         fUnFuncs[symbol("SigDelay1")]  = &FaustAlgebra::Delay1;

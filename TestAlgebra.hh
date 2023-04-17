@@ -32,7 +32,6 @@ class TestAlgebra : public FaustAlgebra<int>
     T HSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
     T HBargraph(const T& name, const T& lo, const T& hi) override;
     T VBargraph(const T& name, const T& lo, const T& hi) override;
-
     T NumEntry(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
     T Attach(const T& x, const T& y) override;
 
@@ -99,4 +98,9 @@ class TestAlgebra : public FaustAlgebra<int>
     T SoundFileLength(const T& sf, const T& x) override;
     T SoundFileBuffer(const T& sf, const T& x, const T& y, const T& z) override;
     T Waveform(const std::vector<T>& w) override;
+
+    // Foreign functions
+    T ForeignFunction(const std::vector<T>& ff) override;
+    T ForeignVar(const T& type, const T& name, const T& file) override;
+    T ForeignConst(const T& type, const T& name, const T& file) override;
 };
