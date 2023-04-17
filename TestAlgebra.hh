@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "FaustAlgebra.hh"
 
 /**
@@ -11,11 +12,18 @@ class TestAlgebra : public FaustAlgebra<int>
 
    public:
     // Injections of external values
-    T nil() override;
-    T num(int x) override;
-    T num(double x) override;
-    T label(const std::string& s) override;
+    T Nil() override;
+    T IntNum(int x) override;
+    T Int64Num(int64_t x) override;
+    T FloatNum(double x) override;
+    T Label(const std::string& s) override;
+
+    // Used when searching for fixpoint
     T FixPointUpdate(const T& x, const T& y) override;
+
+    // Input and output
+    T Input(const T& c) override;
+    T Output(const T& c, const T& x) override;
 
     // User interface elements
     T Button(const T& name) override;
@@ -23,6 +31,7 @@ class TestAlgebra : public FaustAlgebra<int>
     T VSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
     T HSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
     T NumEntry(const T& name, const T& init, const T& lo, const T& hi, const T& step) override;
+    T Attach(const T& x, const T& y) override;
 
     T Abs(const T& x) override;
     T Add(const T& x, const T& y) override;
@@ -43,7 +52,6 @@ class TestAlgebra : public FaustAlgebra<int>
     T Ceil(const T& x) override;
     T Cos(const T& x) override;
     T Cosh(const T& x) override;
-    T Delay(const T& x, const T& y) override;
     T Eq(const T& x, const T& y) override;
     T Exp(const T& x) override;
     T FloatCast(const T& x) override;
@@ -57,7 +65,6 @@ class TestAlgebra : public FaustAlgebra<int>
     T Lsh(const T& x, const T& y) override;
     T Lt(const T& x, const T& y) override;
     T Max(const T& x, const T& y) override;
-    T Mem(const T& x) override;
     T Min(const T& x, const T& y) override;
     T Ne(const T& x, const T& y) override;
     T Not(const T& x) override;
@@ -66,10 +73,23 @@ class TestAlgebra : public FaustAlgebra<int>
     T Remainder(const T& x) override;
     T Rint(const T& x) override;
     T Rsh(const T& x, const T& y) override;
+    T Select2(const T& x, const T& y, const T& z) override;
     T Sin(const T& x) override;
     T Sinh(const T& x) override;
     T Sqrt(const T& x) override;
     T Tan(const T& x) override;
     T Tanh(const T& x) override;
     T Xor(const T& x, const T& y) override;
+
+    // Delays, Tables and SoundFiles
+    T Delay1(const T& x) override;
+    T Delay(const T& x, const T& y) override;
+    T Prefix(const T& x, const T& y) override;
+    T RDTbl(const T& wtbl, const T& ri) override;
+    T WRTbl(const T& n, const T& g, const T& wi, const T& ws) override;
+    T SoundFile(const T& label) override;
+    T SoundFileRate(const T& sf, const T& x) override;
+    T SoundFileLength(const T& sf, const T& x) override;
+    T SoundFileBuffer(const T& sf, const T& x, const T& y, const T& z) override;
+    T Waveform(const std::vector<T>& w) override;
 };

@@ -6,97 +6,130 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "symbol.hh"
 
-// A faust algebra is the set of primitive operations available in Faust on signals for example
+// A faust algebra is the set of primitive operations available on Faust signals. All these operations are callable
+// directly or via dispatch tables according to their arity and name when visiting a tree of expressions. Derived
+// algebras just have to specify the type T and implement the primitive operations for this type T.
 template <typename T>
 class FaustAlgebra
 {
    public:
+    //--------------------------------------------------------------------------------
+    // Dispatch tables
+    //--------------------------------------------------------------------------------
+
+    // the various types of primitive operations
     using unfunc   = T (FaustAlgebra::*)(const T&);
     using binfunc  = T (FaustAlgebra::*)(const T&, const T&);
     using trifunc  = T (FaustAlgebra::*)(const T&, const T&, const T&);
     using quadfunc = T (FaustAlgebra::*)(const T&, const T&, const T&, const T&);
     using quinfunc = T (FaustAlgebra::*)(const T&, const T&, const T&, const T&, const T&);
+    using varfunc  = T (FaustAlgebra::*)(const std::vector<T>& w);
 
+    // The dispatch tables
     std::map<Sym, unfunc>   fUnFuncs;
     std::map<Sym, binfunc>  fBinFuncs;
     std::map<Sym, trifunc>  fTriFuncs;
     std::map<Sym, quadfunc> fQuadFuncs;
     std::map<Sym, quinfunc> fQuinFuncs;
+    std::map<Sym, varfunc>  fVarFuncs;
 
-    // Injections of external values
-    virtual T nil()                       = 0;
-    virtual T num(int x)                  = 0;
-    virtual T num(double x)               = 0;
-    virtual T label(const std::string& s) = 0;
+    //--------------------------------------------------------------------------------
+    // List of all the primitive operations
+    //--------------------------------------------------------------------------------
 
-    virtual T FixPointUpdate(const T& x, const T& y) = 0;  // used when searching fix point
+    // Injections of external values (numbers and strings)
+    virtual T Nil()                       = 0;
+    virtual T IntNum(int x)               = 0;
+    virtual T Int64Num(int64_t x)         = 0;
+    virtual T FloatNum(double x)          = 0;
+    virtual T Label(const std::string& s) = 0;
 
-    // User interface elements
+    // Used when searching for fixpoint
+    virtual T FixPointUpdate(const T& x, const T& y) = 0;
+
+    // Input Output Operations
+    virtual T Input(const T& chan)              = 0;
+    virtual T Output(const T& chan, const T& x) = 0;
+
+    // User Interface Elements
     virtual T Button(const T& name)                                                           = 0;
     virtual T Checkbox(const T& name)                                                         = 0;
     virtual T VSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step)  = 0;
     virtual T HSlider(const T& name, const T& init, const T& lo, const T& hi, const T& step)  = 0;
     virtual T NumEntry(const T& name, const T& init, const T& lo, const T& hi, const T& step) = 0;
+    virtual T Attach(const T& x, const T& y)                                                  = 0;
 
-    // Operations
-    virtual T Abs(const T& x)               = 0;
-    virtual T Add(const T& x, const T& y)   = 0;
-    virtual T Sub(const T& x, const T& y)   = 0;
-    virtual T Mul(const T& x, const T& y)   = 0;
-    virtual T Div(const T& x, const T& y)   = 0;
-    virtual T Inv(const T& x)               = 0;
-    virtual T Neg(const T& x)               = 0;
-    virtual T Mod(const T& x, const T& y)   = 0;
-    virtual T Acos(const T& x)              = 0;
-    virtual T Acosh(const T& x)             = 0;
-    virtual T And(const T& x, const T& y)   = 0;
-    virtual T Asin(const T& x)              = 0;
-    virtual T Asinh(const T& x)             = 0;
-    virtual T Atan(const T& x)              = 0;
-    virtual T Atan2(const T& x, const T& y) = 0;
-    virtual T Atanh(const T& x)             = 0;
-    virtual T Ceil(const T& x)              = 0;
-    virtual T Cos(const T& x)               = 0;
-    virtual T Cosh(const T& x)              = 0;
-    virtual T Delay(const T& x, const T& y) = 0;
-    virtual T Eq(const T& x, const T& y)    = 0;
-    virtual T Exp(const T& x)               = 0;
-    virtual T FloatCast(const T& x)         = 0;
-    virtual T Floor(const T& x)             = 0;
-    virtual T Ge(const T& x, const T& y)    = 0;
-    virtual T Gt(const T& x, const T& y)    = 0;
-    virtual T IntCast(const T& x)           = 0;
-    virtual T Le(const T& x, const T& y)    = 0;
-    virtual T Log(const T& x)               = 0;
-    virtual T Log10(const T& x)             = 0;
-    virtual T Lsh(const T& x, const T& y)   = 0;
-    virtual T Lt(const T& x, const T& y)    = 0;
-    virtual T Max(const T& x, const T& y)   = 0;
-    virtual T Mem(const T& x)               = 0;
-    virtual T Min(const T& x, const T& y)   = 0;
-    virtual T Ne(const T& x, const T& y)    = 0;
-    virtual T Not(const T& x)               = 0;
-    virtual T Or(const T& x, const T& y)    = 0;
-    virtual T Pow(const T& x, const T& y)   = 0;
-    virtual T Remainder(const T& x)         = 0;
-    virtual T Rint(const T& x)              = 0;
-    virtual T Rsh(const T& x, const T& y)   = 0;
-    virtual T Sin(const T& x)               = 0;
-    virtual T Sinh(const T& x)              = 0;
-    virtual T Sqrt(const T& x)              = 0;
-    virtual T Tan(const T& x)               = 0;
-    virtual T Tanh(const T& x)              = 0;
-    virtual T Xor(const T& x, const T& y)   = 0;
+    // Numerical Operations
+    virtual T Abs(const T& x)                             = 0;
+    virtual T Add(const T& x, const T& y)                 = 0;
+    virtual T Sub(const T& x, const T& y)                 = 0;
+    virtual T Mul(const T& x, const T& y)                 = 0;
+    virtual T Div(const T& x, const T& y)                 = 0;
+    virtual T Inv(const T& x)                             = 0;
+    virtual T Neg(const T& x)                             = 0;
+    virtual T Mod(const T& x, const T& y)                 = 0;
+    virtual T Acos(const T& x)                            = 0;
+    virtual T Acosh(const T& x)                           = 0;
+    virtual T And(const T& x, const T& y)                 = 0;
+    virtual T Asin(const T& x)                            = 0;
+    virtual T Asinh(const T& x)                           = 0;
+    virtual T Atan(const T& x)                            = 0;
+    virtual T Atan2(const T& x, const T& y)               = 0;
+    virtual T Atanh(const T& x)                           = 0;
+    virtual T Ceil(const T& x)                            = 0;
+    virtual T Cos(const T& x)                             = 0;
+    virtual T Cosh(const T& x)                            = 0;
+    virtual T Eq(const T& x, const T& y)                  = 0;
+    virtual T Exp(const T& x)                             = 0;
+    virtual T FloatCast(const T& x)                       = 0;
+    virtual T Floor(const T& x)                           = 0;
+    virtual T Ge(const T& x, const T& y)                  = 0;
+    virtual T Gt(const T& x, const T& y)                  = 0;
+    virtual T IntCast(const T& x)                         = 0;
+    virtual T Le(const T& x, const T& y)                  = 0;
+    virtual T Log(const T& x)                             = 0;
+    virtual T Log10(const T& x)                           = 0;
+    virtual T Lsh(const T& x, const T& y)                 = 0;
+    virtual T Lt(const T& x, const T& y)                  = 0;
+    virtual T Max(const T& x, const T& y)                 = 0;
+    virtual T Min(const T& x, const T& y)                 = 0;
+    virtual T Ne(const T& x, const T& y)                  = 0;
+    virtual T Not(const T& x)                             = 0;
+    virtual T Or(const T& x, const T& y)                  = 0;
+    virtual T Pow(const T& x, const T& y)                 = 0;
+    virtual T Remainder(const T& x)                       = 0;
+    virtual T Rint(const T& x)                            = 0;
+    virtual T Rsh(const T& x, const T& y)                 = 0;
+    virtual T Select2(const T& x, const T& y, const T& z) = 0;
+    virtual T Sin(const T& x)                             = 0;
+    virtual T Sinh(const T& x)                            = 0;
+    virtual T Sqrt(const T& x)                            = 0;
+    virtual T Tan(const T& x)                             = 0;
+    virtual T Tanh(const T& x)                            = 0;
+    virtual T Xor(const T& x, const T& y)                 = 0;
+
+    // Delays, Tables and SoundFiles
+    virtual T Delay1(const T& x)                                               = 0;
+    virtual T Delay(const T& x, const T& y)                                    = 0;
+    virtual T Prefix(const T& x, const T& y)                                   = 0;
+    virtual T RDTbl(const T& wtbl, const T& ri)                                = 0;
+    virtual T WRTbl(const T& n, const T& g, const T& wi, const T& ws)          = 0;
+    virtual T SoundFile(const T& label)                                        = 0;
+    virtual T SoundFileRate(const T& sf, const T& x)                           = 0;
+    virtual T SoundFileLength(const T& sf, const T& x)                         = 0;
+    virtual T SoundFileBuffer(const T& sf, const T& x, const T& y, const T& z) = 0;
+    virtual T Waveform(const std::vector<T>& w)                                = 0;
 
     //--------------------------------------------------------------------------------
-    // Calling the various operations according to the opcode
+    // Calling the various operations according to the opcode symbol
     // and the number of arguments
     //--------------------------------------------------------------------------------
 
-    // call unary opcode
+    // Call unary opcode
     [[nodiscard]] T operator()(Sym n, const T& a)
     {
         auto p = fUnFuncs.find(n);
@@ -107,7 +140,7 @@ class FaustAlgebra
         return std::invoke(p->second, this, a);
     }
 
-    // call binary opcode
+    // Call binary opcode
     [[nodiscard]] T operator()(Sym n, const T& a, const T& b)
     {
         auto p = fBinFuncs.find(n);
@@ -118,7 +151,7 @@ class FaustAlgebra
         return std::invoke(p->second, this, a, b);
     }
 
-    // call ternary opcode
+    // Call ternary opcode
     [[nodiscard]] T operator()(Sym n, const T& a, const T& b, const T& c)
     {
         auto p = fTriFuncs.find(n);
@@ -129,7 +162,7 @@ class FaustAlgebra
         return std::invoke(p->second, this, a, b, c);
     }
 
-    // call quaternary opcode
+    // Call quaternary opcode
     [[nodiscard]] T operator()(Sym n, const T& a, const T& b, const T& c, const T& d)
     {
         auto p = fQuadFuncs.find(n);
@@ -140,7 +173,7 @@ class FaustAlgebra
         return std::invoke(p->second, this, a, b, c, d);
     }
 
-    // call quinary opcodes
+    // Call quinary opcodes
     [[nodiscard]] T operator()(Sym n, const T& a, const T& b, const T& c, const T& d, const T& e)
     {
         auto p = fQuinFuncs.find(n);
@@ -151,18 +184,34 @@ class FaustAlgebra
         return std::invoke(p->second, this, a, b, c, d, e);
     }
 
+    // Call variadic opcodes
+    [[nodiscard]] T operator()(Sym n, const std::vector<T>& v)
+    {
+        auto p = fVarFuncs.find(n);
+        if (p == fVarFuncs.end()) {
+            std::cerr << "Unknown variadic opcode " << n << std::endl;
+            exit(-1);
+        }
+        return std::invoke(p->second, this, v);
+    }
+
     virtual ~FaustAlgebra() = default;
+
+    //--------------------------------------------------------------------------------
+    // The role of the constructor is to build the various dispatch tables.
+    //
+    //--------------------------------------------------------------------------------
 
     FaustAlgebra()
     {
         // building the dispatch tables
         // UNARY METHODS
 
-        // User interface elements
+        // Unary user interface methods
         fUnFuncs[symbol("button")]   = &FaustAlgebra::Button;
         fUnFuncs[symbol("checkbox")] = &FaustAlgebra::Checkbox;
 
-        // Operations
+        // Unary Methods
         fUnFuncs[symbol("abs")]       = &FaustAlgebra::Abs;
         fUnFuncs[symbol("inv")]       = &FaustAlgebra::Inv;
         fUnFuncs[symbol("neg")]       = &FaustAlgebra::Neg;
@@ -181,7 +230,6 @@ class FaustAlgebra
         fUnFuncs[symbol("intcast")]   = &FaustAlgebra::IntCast;
         fUnFuncs[symbol("log")]       = &FaustAlgebra::Log;
         fUnFuncs[symbol("log10")]     = &FaustAlgebra::Log10;
-        fUnFuncs[symbol("mem")]       = &FaustAlgebra::Mem;
         fUnFuncs[symbol("not")]       = &FaustAlgebra::Not;
         fUnFuncs[symbol("remainder")] = &FaustAlgebra::Remainder;
         fUnFuncs[symbol("rint")]      = &FaustAlgebra::Rint;
@@ -191,32 +239,51 @@ class FaustAlgebra
         fUnFuncs[symbol("tan")]       = &FaustAlgebra::Tan;
         fUnFuncs[symbol("tanh")]      = &FaustAlgebra::Tanh;
 
-        // BINARY METHODS
-        fBinFuncs[symbol("add")]   = &FaustAlgebra::Add;
-        fBinFuncs[symbol("sub")]   = &FaustAlgebra::Sub;
-        fBinFuncs[symbol("mul")]   = &FaustAlgebra::Mul;
-        fBinFuncs[symbol("div")]   = &FaustAlgebra::Div;
-        fBinFuncs[symbol("mod")]   = &FaustAlgebra::Mod;
-        fBinFuncs[symbol("and")]   = &FaustAlgebra::And;
-        fBinFuncs[symbol("atan2")] = &FaustAlgebra::Atan2;
-        fBinFuncs[symbol("delay")] = &FaustAlgebra::Delay;
-        fBinFuncs[symbol("eq")]    = &FaustAlgebra::Eq;
-        fBinFuncs[symbol("ge")]    = &FaustAlgebra::Ge;
-        fBinFuncs[symbol("gt")]    = &FaustAlgebra::Gt;
-        fBinFuncs[symbol("lsh")]   = &FaustAlgebra::Lsh;
-        fBinFuncs[symbol("lt")]    = &FaustAlgebra::Lt;
-        fBinFuncs[symbol("max")]   = &FaustAlgebra::Max;
-        fBinFuncs[symbol("min")]   = &FaustAlgebra::Min;
-        fBinFuncs[symbol("ne")]    = &FaustAlgebra::Ne;
-        fBinFuncs[symbol("or")]    = &FaustAlgebra::Or;
-        fBinFuncs[symbol("pow")]   = &FaustAlgebra::Pow;
-        fBinFuncs[symbol("le")]    = &FaustAlgebra::Le;
-        fBinFuncs[symbol("rsh")]   = &FaustAlgebra::Rsh;
-        fBinFuncs[symbol("xor")]   = &FaustAlgebra::Xor;
+        // Binary Methods
+        fBinFuncs[symbol("add")]    = &FaustAlgebra::Add;
+        fBinFuncs[symbol("sub")]    = &FaustAlgebra::Sub;
+        fBinFuncs[symbol("mul")]    = &FaustAlgebra::Mul;
+        fBinFuncs[symbol("div")]    = &FaustAlgebra::Div;
+        fBinFuncs[symbol("mod")]    = &FaustAlgebra::Mod;
+        fBinFuncs[symbol("and")]    = &FaustAlgebra::And;
+        fBinFuncs[symbol("atan2")]  = &FaustAlgebra::Atan2;
+        fBinFuncs[symbol("delay")]  = &FaustAlgebra::Delay;
+        fBinFuncs[symbol("eq")]     = &FaustAlgebra::Eq;
+        fBinFuncs[symbol("ge")]     = &FaustAlgebra::Ge;
+        fBinFuncs[symbol("gt")]     = &FaustAlgebra::Gt;
+        fBinFuncs[symbol("lsh")]    = &FaustAlgebra::Lsh;
+        fBinFuncs[symbol("lt")]     = &FaustAlgebra::Lt;
+        fBinFuncs[symbol("max")]    = &FaustAlgebra::Max;
+        fBinFuncs[symbol("min")]    = &FaustAlgebra::Min;
+        fBinFuncs[symbol("ne")]     = &FaustAlgebra::Ne;
+        fBinFuncs[symbol("or")]     = &FaustAlgebra::Or;
+        fBinFuncs[symbol("prefix")] = &FaustAlgebra::Prefix;
+        fBinFuncs[symbol("pow")]    = &FaustAlgebra::Pow;
+        fBinFuncs[symbol("le")]     = &FaustAlgebra::Le;
+        fBinFuncs[symbol("rsh")]    = &FaustAlgebra::Rsh;
+        fBinFuncs[symbol("xor")]    = &FaustAlgebra::Xor;
 
-        // QUINTARY METHODS
+        // Quintary Methods
         fQuinFuncs[symbol("vslider")]  = &FaustAlgebra::VSlider;
         fQuinFuncs[symbol("hslider")]  = &FaustAlgebra::HSlider;
         fQuinFuncs[symbol("numentry")] = &FaustAlgebra::NumEntry;
+
+        // Input and output
+
+        fUnFuncs[symbol("input")]   = &FaustAlgebra::Input;
+        fBinFuncs[symbol("output")] = &FaustAlgebra::Output;
+
+        // Delays, Tables and SoundFiles
+        fUnFuncs[symbol("delay1")]  = &FaustAlgebra::Delay1;
+        fBinFuncs[symbol("delay")]  = &FaustAlgebra::Delay;
+        fBinFuncs[symbol("prefix")] = &FaustAlgebra::Prefix;
+        fBinFuncs[symbol("rdtbl")]  = &FaustAlgebra::RDTbl;
+        fQuadFuncs[symbol("wrtbl")] = &FaustAlgebra::WRTbl;
+
+        fUnFuncs[symbol("soundfile")]         = &FaustAlgebra::SoundFile;
+        fBinFuncs[symbol("soundfilerate")]    = &FaustAlgebra::SoundFileRate;
+        fBinFuncs[symbol("soundfilelength")]  = &FaustAlgebra::SoundFileLength;
+        fQuadFuncs[symbol("soundfilebuffer")] = &FaustAlgebra::SoundFileBuffer;
+        fVarFuncs[symbol("waveform")]         = &FaustAlgebra::Waveform;
     }
 };

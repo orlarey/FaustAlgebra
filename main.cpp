@@ -13,7 +13,7 @@ void hello()
 void test1()
 {
     TestAlgebra A;
-    std::cout << "Test 1: " << A.Add(A.Mul(A.num(10), A.num(20)), A.num(30)) << std::endl;
+    std::cout << "Test 1: " << A.Add(A.Mul(A.IntNum(10), A.IntNum(20)), A.IntNum(30)) << std::endl;
 }
 int main()
 {
