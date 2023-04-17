@@ -1,0 +1,24 @@
+name: Windows
+
+on:
+  push:
+    branches: 
+      - '*'
+  pull_request:
+    branches: 
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: create cmake project
+      run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+    - name: build cmake project
+      run: cmake --build build --config Release
+    - name: execute test
+      run: ./build/Release/test.exe
+

@@ -1,0 +1,23 @@
+name: macOS
+
+on:
+  push:
+    branches: 
+      - '*'
+  pull_request:
+    branches: 
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: create cmake project
+      run: cmake -DNOTIDY=ON -B build -S .
+    - name: build cmake project
+      run: cmake --build build/ --target all
+    - name: execute test
+      run: ./build/test
