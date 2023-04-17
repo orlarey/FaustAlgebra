@@ -93,6 +93,8 @@ class TestAlgebra : public FaustAlgebra<int>
     T Prefix(const T& x, const T& y) override;
     T RDTbl(const T& wtbl, const T& ri) override;
     T WRTbl(const T& n, const T& g, const T& wi, const T& ws) override;
+    T Gen(const T& g) override;
+
     T SoundFile(const T& label) override;
     T SoundFileRate(const T& sf, const T& x) override;
     T SoundFileLength(const T& sf, const T& x) override;

@@ -332,6 +332,10 @@ T TestAlgebra::WRTbl(const T& n, const T& g, const T& wi, const T& ws)
 {
     return 1 + std::max(std::max(n, g), std::max(wi, ws));
 };
+T TestAlgebra::Gen(const T& g)
+{
+    return 1 + g;
+};
 
 T TestAlgebra::SoundFile(const T& label)
 {
@@ -355,15 +359,15 @@ T TestAlgebra::Waveform(const std::vector<T>&)
 };
 
 // Foreign functions
-T TestAlgebra::ForeignFunction(const std::vector<T>& ff)
+T TestAlgebra::ForeignFunction(const std::vector<T>&)
 {
     return 1;
 }
-T TestAlgebra::ForeignVar(const T& type, const T& name, const T& file)
+T TestAlgebra::ForeignVar(const T&, const T&, const T&)
 {
     return 1;
 }
-T TestAlgebra::ForeignConst(const T& type, const T& name, const T& file)
+T TestAlgebra::ForeignConst(const T&, const T&, const T&)
 {
     return 1;
 }
