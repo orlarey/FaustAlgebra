@@ -21,6 +21,7 @@ endif()
 
 
 # add the executable
-add_executable(test main.cpp)
+add_executable(test main.cpp TestAlgebra.cpp tlib/errormsg.cpp tlib/garbageable.cpp tlib/list.cpp tlib/node.cpp tlib/occur.cpp tlib/recursive-tree.cpp tlib/shlysis.cpp tlib/symbol.cpp tlib/tree.cpp)
 
 
+include_directories(tlib FaustAlgebra)
