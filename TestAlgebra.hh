@@ -88,7 +88,7 @@ class TestAlgebra : public FaustAlgebra<int>
     T Xor(const T& x, const T& y) override;
 
     // Delays, Tables and SoundFiles
-    T Delay1(const T& x) override;
+    T Mem(const T& x) override;
     T Delay(const T& x, const T& y) override;
     T Prefix(const T& x, const T& y) override;
     T RDTbl(const T& wtbl, const T& ri) override;

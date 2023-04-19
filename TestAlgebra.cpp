@@ -311,7 +311,7 @@ T TestAlgebra::Output(const T& c, const T& x)
 }
 
 // Delays, Tables and SoundFiles
-T TestAlgebra::Delay1(const T& x)
+T TestAlgebra::Mem(const T& x)
 {
     return 1 + x;
 }
