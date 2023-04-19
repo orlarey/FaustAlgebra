@@ -11,11 +11,14 @@
 #include "symbol.hh"
 
 //=====================================================================================================================
-// A Faust Algebra is a class grouping the set of primitive operations available on Faust signals. All these operations
-// are callable directly or via dispatch tables according to their arity and name. The dispatch tables are typically
-// used when recursively visiting an expressions tree while applying an algebra. Derived algebras just have to
-// specify the type T and implement the primitive operations for this type T. Example of derived algebras are
-// Interval Algebras, TypeInference Algebras, Expression Tree Algebras, Compiler Algebras, etc.
+// A Faust Algebra is a class grouping the set of primitive operations available
+// on Faust signals. All these operations are callable directly or via dispatch
+// tables according to their arity and name. The dispatch tables are typically
+// used when recursively visiting an expressions tree while applying an algebra.
+// Derived algebras just have to specify the type T and implement the primitive
+// operations for this type T. Example of derived algebras are Interval
+// Algebras, TypeInference Algebras, Expression Tree Algebras, Compiler
+// Algebras, etc.
 //=====================================================================================================================
 
 template <typename T>
@@ -123,13 +126,12 @@ class FaustAlgebra
     virtual T Xor(const T& x, const T& y)                 = 0;
 
     // Delays, Tables and SoundFiles
-    virtual T Delay1(const T& x)                                      = 0;
-    virtual T Delay(const T& x, const T& y)                           = 0;
-    virtual T Prefix(const T& x, const T& y)                          = 0;
-    virtual T RDTbl(const T& wtbl, const T& ri)                       = 0;
-    virtual T WRTbl(const T& n, const T& g, const T& wi, const T& ws) = 0;
-    virtual T Gen(const T& g)                                         = 0;
-
+    virtual T Mem(const T& x)                                                  = 0;
+    virtual T Delay(const T& x, const T& y)                                    = 0;
+    virtual T Prefix(const T& x, const T& y)                                   = 0;
+    virtual T RDTbl(const T& wtbl, const T& ri)                                = 0;
+    virtual T WRTbl(const T& n, const T& g, const T& wi, const T& ws)          = 0;
+    virtual T Gen(const T& x)                                                  = 0;
     virtual T SoundFile(const T& label)                                        = 0;
     virtual T SoundFileRate(const T& sf, const T& x)                           = 0;
     virtual T SoundFileLength(const T& sf, const T& x)                         = 0;
@@ -237,7 +239,6 @@ class FaustAlgebra
 
         fUnFuncs[symbol("inv")]       = &FaustAlgebra::Inv;
         fUnFuncs[symbol("abs")]       = &FaustAlgebra::Abs;
-        fUnFuncs[symbol("inv")]       = &FaustAlgebra::Inv;
         fUnFuncs[symbol("neg")]       = &FaustAlgebra::Neg;
         fUnFuncs[symbol("acos")]      = &FaustAlgebra::Acos;
         fUnFuncs[symbol("acosh")]     = &FaustAlgebra::Acosh;
@@ -260,32 +261,30 @@ class FaustAlgebra
         fUnFuncs[symbol("sqrt")]      = &FaustAlgebra::Sqrt;
         fUnFuncs[symbol("tan")]       = &FaustAlgebra::Tan;
         fUnFuncs[symbol("tanh")]      = &FaustAlgebra::Tanh;
-        fUnFuncs[symbol("SigGen")]    = &FaustAlgebra::Gen;
 
         // Binary Methods
-        fBinFuncs[symbol("add")]       = &FaustAlgebra::Add;
-        fBinFuncs[symbol("sub")]       = &FaustAlgebra::Sub;
-        fBinFuncs[symbol("mul")]       = &FaustAlgebra::Mul;
-        fBinFuncs[symbol("div")]       = &FaustAlgebra::Div;
-        fBinFuncs[symbol("mod")]       = &FaustAlgebra::Mod;
-        fBinFuncs[symbol("and")]       = &FaustAlgebra::And;
-        fBinFuncs[symbol("atan2")]     = &FaustAlgebra::Atan2;
-        fBinFuncs[symbol("delay")]     = &FaustAlgebra::Delay;
-        fBinFuncs[symbol("eq")]        = &FaustAlgebra::Eq;
-        fBinFuncs[symbol("ge")]        = &FaustAlgebra::Ge;
-        fBinFuncs[symbol("gt")]        = &FaustAlgebra::Gt;
-        fBinFuncs[symbol("lsh")]       = &FaustAlgebra::Lsh;
-        fBinFuncs[symbol("lt")]        = &FaustAlgebra::Lt;
-        fBinFuncs[symbol("max")]       = &FaustAlgebra::Max;
-        fBinFuncs[symbol("min")]       = &FaustAlgebra::Min;
-        fBinFuncs[symbol("ne")]        = &FaustAlgebra::Ne;
-        fBinFuncs[symbol("or")]        = &FaustAlgebra::Or;
-        fBinFuncs[symbol("prefix")]    = &FaustAlgebra::Prefix;
-        fBinFuncs[symbol("pow")]       = &FaustAlgebra::Pow;
-        fBinFuncs[symbol("le")]        = &FaustAlgebra::Le;
-        fBinFuncs[symbol("rsh")]       = &FaustAlgebra::Rsh;
-        fBinFuncs[symbol("xor")]       = &FaustAlgebra::Xor;
-        fBinFuncs[symbol("SIgAttach")] = &FaustAlgebra::Attach;
+        fBinFuncs[symbol("add")]   = &FaustAlgebra::Add;
+        fBinFuncs[symbol("sub")]   = &FaustAlgebra::Sub;
+        fBinFuncs[symbol("mul")]   = &FaustAlgebra::Mul;
+        fBinFuncs[symbol("div")]   = &FaustAlgebra::Div;
+        fBinFuncs[symbol("mod")]   = &FaustAlgebra::Mod;
+        fBinFuncs[symbol("and")]   = &FaustAlgebra::And;
+        fBinFuncs[symbol("atan2")] = &FaustAlgebra::Atan2;
+        fBinFuncs[symbol("eq")]    = &FaustAlgebra::Eq;
+        fBinFuncs[symbol("ge")]    = &FaustAlgebra::Ge;
+        fBinFuncs[symbol("gt")]    = &FaustAlgebra::Gt;
+        fBinFuncs[symbol("lsh")]   = &FaustAlgebra::Lsh;
+        fBinFuncs[symbol("lt")]    = &FaustAlgebra::Lt;
+        fBinFuncs[symbol("max")]   = &FaustAlgebra::Max;
+        fBinFuncs[symbol("min")]   = &FaustAlgebra::Min;
+        fBinFuncs[symbol("ne")]    = &FaustAlgebra::Ne;
+        fBinFuncs[symbol("or")]    = &FaustAlgebra::Or;
+        fBinFuncs[symbol("pow")]   = &FaustAlgebra::Pow;
+        fBinFuncs[symbol("le")]    = &FaustAlgebra::Le;
+        fBinFuncs[symbol("rsh")]   = &FaustAlgebra::Rsh;
+        fBinFuncs[symbol("xor")]   = &FaustAlgebra::Xor;
+
+        fBinFuncs[symbol("SigAttach")] = &FaustAlgebra::Attach;
 
         // Ternary Methods
         fTriFuncs[symbol("SigSelect2")]   = &FaustAlgebra::Select2;
@@ -298,25 +297,27 @@ class FaustAlgebra
         fQuinFuncs[symbol("SigNumEntry")] = &FaustAlgebra::NumEntry;
 
         // Input and output
+
         fUnFuncs[symbol("SigInput")]   = &FaustAlgebra::Input;
         fBinFuncs[symbol("SigOutput")] = &FaustAlgebra::Output;
 
-        // Foreign functions
-        fVarFuncs[symbol("SigFFun")]   = &FaustAlgebra::ForeignFunction;
-        fTriFuncs[symbol("SigFVar")]   = &FaustAlgebra::ForeignVar;
-        fTriFuncs[symbol("SigFConst")] = &FaustAlgebra::ForeignConst;
-
         // Delays, Tables and SoundFiles
-        fUnFuncs[symbol("SigDelay1")]  = &FaustAlgebra::Delay1;
+        fUnFuncs[symbol("SigDelay1")]  = &FaustAlgebra::Mem;
         fBinFuncs[symbol("SigDelay")]  = &FaustAlgebra::Delay;
         fBinFuncs[symbol("SigPrefix")] = &FaustAlgebra::Prefix;
         fBinFuncs[symbol("SigRDTbl")]  = &FaustAlgebra::RDTbl;
         fQuadFuncs[symbol("SigWRTbl")] = &FaustAlgebra::WRTbl;
+        fUnFuncs[symbol("SigGen")]     = &FaustAlgebra::Gen;
 
         fUnFuncs[symbol("SigSoundfile")]         = &FaustAlgebra::SoundFile;
         fBinFuncs[symbol("SigSoundfileRate")]    = &FaustAlgebra::SoundFileRate;
         fBinFuncs[symbol("SigSoundfileLength")]  = &FaustAlgebra::SoundFileLength;
         fQuadFuncs[symbol("SigSoundfileBuffer")] = &FaustAlgebra::SoundFileBuffer;
         fVarFuncs[symbol("SigWaveform")]         = &FaustAlgebra::Waveform;
+
+        // Foreign functions
+        fVarFuncs[symbol("SigFFun")]   = &FaustAlgebra::ForeignFunction;
+        fTriFuncs[symbol("SigFVar")]   = &FaustAlgebra::ForeignVar;
+        fTriFuncs[symbol("SigFConst")] = &FaustAlgebra::ForeignConst;
     }
 };
